@@ -1,0 +1,13 @@
+.container-account{
+    width: 900px;
+    height: fit-content;
+    margin: 2% auto;
+    border: 1px solid black;
+    display:grid;
+    grid-template-columns: 300px 600px;
+}
+
+.container-main{
+    width:600px;
+    height:fit-content;
+}

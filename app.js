@@ -13,6 +13,7 @@ var config = require('./config');
 //all routers
 var usersRouter = require('./routes/users');
 const uploadRouter = require('./routes/uploadRouter');
+var chatRouter = require('./routes/chatRouter');
 
 //all models
 
@@ -41,6 +42,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //all routers for using
 app.use('/users', usersRouter);
 app.use('/imageUpload',uploadRouter);
+app.use('/chat',chatRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

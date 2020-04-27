@@ -1,0 +1,18 @@
+.ant-card-body{
+    padding: 16px;
+    animation: appear-anim-card 1s ease forwards;
+}
+
+.add-friend-button{
+    position: absolute;
+    float: right;
+}
+
+@keyframes appear-anim-card{
+    from{
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}

@@ -1,0 +1,31 @@
+.container{
+    width: 450px;
+    margin: 10% auto;
+    text-align: center;
+}
+.container__inputs{
+    margin-bottom: 20px;
+}
+
+.container__buttons{
+    display:grid;
+    grid-template-columns: 120px 120px;
+    grid-column-gap: 20px;
+}
+
+.ant-alert{
+    animation: err-appear 0.4s ease forwards;
+    margin-bottom:5px;
+}
+
+@keyframes err-appear{
+    from{
+        transform: scale(0.1)
+    }
+    to{
+        transform: scale(1)
+    }
+}
+
+
+

@@ -46,17 +46,29 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
   res.json({success: true, token: token, status: 'You are successfully logged in!'});
 });
 
-router.get('/logout', (req, res) => {
-  if (req.session) {
-    req.session.destroy();
-    res.clearCookie('session-id');
+router.get('/logout', authenticate.verifyUser,(req, res) => {
+    res.clearCookie('jwt_token');
     res.redirect('/');
-  }
-  else {
-    var err = new Error('You are not logged in!');
-    err.status = 403;
-    next(err);
-  }
+    res.statusCode = 200;
+    res.end('loggedout');
 });
 
+router.post('/checkToken',authenticate.verifyUser,(req,res)=>{
+    res.statusCode = 200;
+    res.setHeader('Content-Type','application/json');
+    res.json({token_status: 'OK'});
+});
+
+router.post('/getuserdata',authenticate.verifyUser,(req,res)=>{
+    let id = req.user._id;
+    User.find({_id:id}).then((user)=>{
+      res.statusCode = 200;
+      res.setHeader('Content-Type','application/json');
+      res.json(user);
+    }).catch((err)=>{
+        res.statusCode = 404;
+        res.setHeader('Content-Type','application/json');
+        res.json({err:err});
+    })
+})
 module.exports = router;
