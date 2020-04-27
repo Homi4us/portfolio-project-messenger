@@ -32,4 +32,5 @@ var User = new Schema({
 
 User.plugin(passportLocalMongoose);
 
+User.set('autoIndex', false);
 module.exports = mongoose.model('User', User);
