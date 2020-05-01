@@ -9,7 +9,7 @@ import { observer } from 'mobx-react'
         return(
             <Switch>
              <Route path = "/account">
-                 <Account account = {props.account} add = {props.add}/>
+                 <Account profile = {props.profile} friends = {props.friends} account = {props.account} add = {props.add}/>
              </Route>
              <Redirect to = "/account"/>
          </Switch>

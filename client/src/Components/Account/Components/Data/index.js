@@ -30,7 +30,7 @@ import { observer } from 'mobx-react';
                     <div className = "container-account__data__login">
                     { this.props.account.isLoaded
                     ?
-                    <h3>Логин: {this.props.account.username}</h3>
+                    <NavLink to = '/account'><h3 id = "login">Логин: {this.props.account.username}</h3></NavLink>
                     : 
                     <Skeleton.Input size = "small"  active/>
                         }

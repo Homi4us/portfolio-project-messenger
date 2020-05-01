@@ -3,3 +3,10 @@
     height:100%;
     padding:10px;
 }
+
+.add-loader{
+    width:100%;
+    height: 720px;
+    text-align: center;
+    margin-top: 10%;
+}

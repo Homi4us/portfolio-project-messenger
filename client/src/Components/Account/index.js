@@ -21,7 +21,7 @@ class Account extends Component {
                         <NavMenu account = {this.props.account}/>
                     </div>
                     <div >
-                        <Main account = {this.props.account} add = {this.props.add}/>
+                        <Main profile = {this.props.profile} friends = {this.props.friends} account = {this.props.account} add = {this.props.add}/>
                     </div>
             </div>
     }

@@ -1,0 +1,17 @@
+.ant-result-subtitle{
+    font-size: 20px;
+    color:grey;
+}
+
+.container-main__account-info{
+    animation: appear-data 1s ease forwards;
+}
+
+@keyframes appear-data{
+    from{
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}

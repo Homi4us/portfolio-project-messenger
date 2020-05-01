@@ -25,16 +25,16 @@ const { confirm } = Modal;
             title: `Действительно хотите добавить ${this.props.username} в друзья?`,
             icon: <QuestionCircleTwoTone />,
             content: 'После нажатия на ОК окно закроется через секунду',
+            cancelText: 'Отменить',
             onOk() {
-              props.add.addFriend(name)
-              setTimeout(()=>{
-                if(props.add.addingStatus){
-                    message.success(props.add.addingMessage)
+              props.add.addFriend(name,(status,mes)=>{
+                if(status){
+                    message.success(mes)
                     props.account.getData()
                 } else {
-                    message.error(props.add.addingMessage)
+                  message.error(mes)
                 }
-              },1000)
+              })
             },
             onCancel() {},
           });
