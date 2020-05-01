@@ -25,7 +25,7 @@ if(cookie.load('jwt_token') != undefined){
 
 ReactDOM.render(
     <BrowserRouter>
-        <App user = {store.user} account = {store.account} add = {store.add}/>
+        <App profile = {store.profile} friends = {store.friends} user = {store.user} account = {store.account} add = {store.add}/>
     </BrowserRouter>
     , document.getElementById('root'));
 serviceWorker.unregister();

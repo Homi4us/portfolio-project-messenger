@@ -88,4 +88,53 @@ router.get('/getfriends', authenticate.verifyUser,(req,res,next)=>{
     })
 })
 
+router.delete('/deletefriend', authenticate.verifyUser,(req,res,next)=>{
+    User.findById(req.user._id).then((user)=>{
+        var del_id;
+        user.friends.forEach((el)=>{
+            if(req.body.id == el._id){
+                del_id = el._id;
+            }
+        })
+        user.friends.id(del_id).remove();
+        user.save();
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json');
+        res.json(user.friends);
+    }).catch((err)=>{
+        var error = new Error('Что-то пошло не так');
+        error.status = 500;
+        next(error);
+    })
+})
+
+router.post('/setuserdata', authenticate.verifyUser,(req,res,next)=>{
+    User.findById(req.user._id).then((user)=>{
+        if((req.body.name == '')&&(req.body.lastname == '')&&(req.body.status == '')){
+            var error = new Error('Все поля не должны быть пустыми');
+            error.status = 400;
+            next(error);
+        } else {
+            if(req.body.name != ''){
+                user.firstname = req.body.name; 
+            }
+            if (req.body.lastname != ''){
+                user.lastname = req.body.lastname;
+            }
+            if (req.body.status != ''){
+                user.status = req.body.status
+            } 
+            user.save();
+            res.statusCode = 200;
+            res.setHeader('Content-Type','application/json');
+            res.json(user);
+        }
+    }).catch((err)=>{
+        var error = new Error('Что-то пошло не так');
+        error.status = 500;
+        next(error);
+    })
+})
+
+
 module.exports = router;

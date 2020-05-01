@@ -1,9 +1,23 @@
 import React, { Component } from 'react'
 import './index.css'
 import { Divider } from 'antd';
+import {
+    SearchOutlined,
+    LoadingOutlined 
+  } from '@ant-design/icons';
 import FriendCard from './FriendCard/index';
+import { observer } from 'mobx-react';
 
-export default class Friends extends Component {
+@observer class Friends extends Component {
+
+    constructor(props){
+        super(props)
+    }
+
+    componentDidMount(){
+        this.props.friends.getFriends()
+    }
+
     render() {
         return (
             <div className = "container-main__friends">
@@ -11,8 +25,26 @@ export default class Friends extends Component {
                 <h2>Список ваших друзей:</h2>
                 <Divider/>
                 </div>
-                <FriendCard username = "Homi4us" avatar = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/588px-Google_%22G%22_Logo.svg.png"/>
+                {this.props.friends.isLoaded
+                ?
+                    this.props.friends.message == ''
+                    ?
+                    this.props.friends.friends.map((el,index)=>{
+                        return <FriendCard status = {el.status} friends = {this.props.friends} id = {el._id} avatar = {el.picture} username = {el.username} key = {index} />
+                    })
+                    :
+                        <div className = "add-loader">
+                            <h3>{this.props.friends.message}</h3>
+                        </div>
+                
+                :
+                <div className = "add-loader">
+                <LoadingOutlined />
+                </div>
+                }
             </div>
         )
     }
 }
+
+export default Friends;

@@ -67,6 +67,9 @@ var user = {
                     setTimeout(()=>{
                         this.isAuthenticated = true;
                     },3000)
+                    setTimeout(()=>{
+                        alert("Ваш токен авторизации истёк, обновите страницу и войдите в аккаунт")
+                    },3600*1000)
                     this.disableForm = false;
                 }
             }).catch((err)=>{
@@ -128,11 +131,13 @@ var add = {
     isLoadedRecommend: false,
     message: '',
     list: [],
-    addingStatus: false,
-    addingMessage:'',
     getRecommendations(){
+        this.isLoadedRecommend = false;
+        this.message = '';
         axios.get('/chat/recommendations',{
-            headers: { Authorization: "Bearer " + cookie.load('jwt_token') }
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token'),
+                "Cache-Control": "no-cache, no-store, must-revalidate"
+        }
         }).then((res)=>{
             this.list = res.data;
             this.isLoadedRecommend = true;
@@ -159,32 +164,133 @@ var add = {
             this.isLoadedRecommend = true;
         })
     },
-    addFriend(id){
+    addFriend(id, callback){
         axios.post('/chat/addfriend',{id:id},{
             headers: { Authorization: "Bearer " + cookie.load('jwt_token') }
         }).then((res)=>{
-            this.addingStatus = true;
-            this.addingMessage = 'Вы добавили пользователя в друзья'
+            callback(true,'Вы добавили пользователя в друзья');
         }).catch((err)=>{
             if(err.response.status == 401){
-                this.addingMessage = 'Данный пользователь уже в друзьях'
-                this.addingStatus = false;
+                callback(false,'Данный пользователь уже в друзьях');
             }else if(err.response.status == 403){
-                this.addingMessage = 'Вы не можете добавить в друзья самого себя'
-                this.addingStatus = false;
+                callback(false,'Вы не можете добавить в друзья самого себя');
             }
              else {
-                this.addingMessage = 'Что-то пошло не так'
-                this.addingStatus = false;
+                callback(false,'Что-то пошло не так');
             }
         })
     }
 }
 
+var friends = {
+    isLoaded: false,
+    friends:[],
+    message: '',
+    getFriends(){
+        this.isLoaded = false;
+        this.message = '';
+        axios.get('/chat/getfriends',{
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token'),
+            "Cache-Control": "no-cache, no-store, must-revalidate"
+        }
+        }).then((res)=>{
+            if(res.data.length == 0){
+                this.message = 'Список друзей пуст'
+            } else {
+                this.friends = res.data;
+                var newArr = [];
+                res.data.forEach((el)=>{
+                newArr.push(el._id);
+            })
+                account.friendsList = newArr;
+            }
+            this.isLoaded = true;
+        }).catch((err)=>{
+            this.message = 'Что-то пошло не так =(';
+            this.isLoaded = true;
+        })
+    },
+    deleteFriend(name,callback){
+        axios.delete('/chat/deletefriend',{
+            data:{id: name},
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token') }
+        }).then((res)=>{
+            callback(true,'Вы удалили пользователя из друзей')
+        }).catch((err)=>{
+            callback(false,'Что-то пошло не так')
+        })
+    }
+}
+
+var profile = {
+    isLoaded: true,
+    formLoaded: false,
+    name: '',
+    lastname: '',
+    status: '',
+    setStatus: false,
+    setMessage: '',
+    userFirstname: '',
+    userLastname: '',
+    userStatus: '',
+    changeHandler(e){
+        switch(e.name){
+            case "firstname":
+                this.name = e.value;
+            break;
+            case "lastname":
+                this.lastname = e.value;
+            break;
+            case "status":
+                this.status = e.value;
+            break;
+        }
+    },
+    setUserData(){
+        this.formLoaded = true;
+        axios.post('/chat/setuserdata',{name: this.name, lastname: this.lastname, status: this.status},{
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token')}
+        }).then((res)=>{
+            this.setStatus = true;
+            this.setMessage = 'Данные успешно сохранены';
+            this.formLoaded = false;
+            this.name = '';
+            this.lastname = '';
+            this.status = '';
+            this.getUserProfile();
+        }).catch((err)=>{
+            if(err.response.status == 400){
+                this.setStatus = false;
+                this.setMessage = 'Заполните хотя бы одно поле!';
+                this.formLoaded = false;
+            } else {
+                this.setStatus = false;
+                this.setMessage = 'Ошибка! Попробуйте позже';
+                this.formLoaded = false;
+            }
+        })
+    },
+    getUserProfile(){
+        this.isLoaded = true;
+        axios.post('/users/getuserdata',{},{
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token') }
+        }).then((res)=>{
+           this.userFirstname = res.data[0].firstname;
+           this.userLastname = res.data[0].lastname;
+           this.userStatus = res.data[0].status;
+           this.isLoaded = false;
+        }).catch((err)=>{
+            this.isLoaded = false;
+        })
+    }
+} 
+
 var store = {
     user:user,
     account: account,
-    add: add
+    add: add,
+    friends: friends,
+    profile: profile
 }
 
 decorate(store.user, {
@@ -205,8 +311,25 @@ decorate(store.add,{
     isLoadedRecommend: observable,
     message: observable,
     list: observable,
-    addingStatus: observable,
-    addingMessage: observable
+})
+
+decorate(store.friends,{
+    isLoaded: observable,
+    friends: observable,
+    message: observable
+})
+
+decorate(store.profile,{
+    isLoaded: observable,
+    formLoaded: observable,
+    name: observable,
+    lastname: observable,
+    status: observable,
+    setStatus: observable,
+    setMessage: observable,
+    userFirstname: observable,
+    userLastname: observable,
+    userStatus: observable
 })
 
 export default store;

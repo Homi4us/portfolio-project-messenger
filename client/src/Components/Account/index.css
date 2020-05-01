@@ -11,3 +11,7 @@
     width:600px;
     height:fit-content;
 }
+
+.ant-card-meta-detail{
+    margin-bottom: 5px;
+}

@@ -37,7 +37,7 @@ import { observer } from 'mobx-react';
                     this.props.add.message == ''
                     ?
                         this.props.add.list.map((el,index)=>{
-                            return <UserCard account = {this.props.account} add = {this.props.add} id = {el._id} avatar = {el.picture} username = {el.username} key = {index} />
+                            return <UserCard friends = {this.props.friends} account = {this.props.account} add = {this.props.add} id = {el._id} avatar = {el.picture} username = {el.username} key = {index} />
                         })
                     :
                         <div className = "add-loader">

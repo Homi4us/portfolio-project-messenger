@@ -11,11 +11,11 @@ var Friends = new Schema({
 var User = new Schema({
     firstname: {
       type: String,
-        default: ''
+        default: 'No'
     },
     lastname: {
       type: String,
-        default: ''
+        default: 'Name'
     },
     admin:   {
         type: Boolean,
@@ -25,7 +25,11 @@ var User = new Schema({
         type: String,
         default: 'https://pngimage.net/wp-content/uploads/2018/06/%D0%B0%D0%BD%D0%BE%D0%BD%D0%B8%D0%BC-png-7.png'
     },
-    friends: [ Friends ]
+    friends: [ Friends ],
+    status: {
+        type: String,
+        default: 'нет статуса'
+    }
 },{
   timestamp:true
 });
