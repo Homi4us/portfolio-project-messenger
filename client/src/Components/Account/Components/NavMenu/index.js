@@ -5,7 +5,8 @@ import {
     TeamOutlined,
     CommentOutlined,
     CloseOutlined,
-    UserAddOutlined
+    UserAddOutlined,
+    PlayCircleOutlined
   } from '@ant-design/icons';
   import { NavLink } from 'react-router-dom';
 
@@ -31,6 +32,7 @@ class NavMenu extends Component {
                     <Menu.Item key = "add"><UserAddOutlined /><NavLink to ="/account/add">Добавить в друзья</NavLink></Menu.Item>
                     <Menu.Item key = "friends"><TeamOutlined /><NavLink to ="/account/friends">Мои друзья</NavLink></Menu.Item>
                     <Menu.Item key = "mychats"><CommentOutlined /><NavLink to ="/account/mychats">Мои чаты</NavLink></Menu.Item>
+                    <Menu.Item key = "games"><PlayCircleOutlined/><NavLink to ="/account/games">Игры</NavLink></Menu.Item>
                     <Menu.Item key = "exit"><CloseOutlined />Выход</Menu.Item>
                     </Menu>
                </div>
