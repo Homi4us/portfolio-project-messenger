@@ -10,10 +10,5 @@ router.get('/info', (req,res,next) => {
     res.statusCode = 200
     res.json({ok: true})
 })
-router.get('/', (req,res,next) => {
-    res.setHeader("content-type","application/json")
-    res.statusCode = 200
-    res.json({ok: true})
-})
 
 module.exports = router
