@@ -13,14 +13,17 @@ class GameTemplate extends Component {
         super(props)
         this.game = gameList.filter((item) => {return item.endpoint == this.props.match.params.game}).pop()
     }
+    componentDidMount(){
+        this.setState({isLoading: 0})
+    }
     render(){
         let component
         switch(this.game.endpoint){
             case "durak":
-                component = <Durak/>
+                component = <Durak store={this.props.gamesStore.durak}/>
                 break;
-            case "durak":
-                component = <Durak/>
+            case "dvoen":
+                component = <div>Пока что тут нет Двоена, не грусти :(</div>
                 break;
             default:
                 component = <div>Игра не найдена :(</div>

@@ -21,7 +21,7 @@ class Account extends Component {
                         <NavMenu account = {this.props.account}/>
                     </div>
                     <div >
-                        <Main chat = {this.props.chat} mychats = {this.props.mychats} createChat = {this.props.createChat} profile = {this.props.profile} friends = {this.props.friends} account = {this.props.account} add = {this.props.add}/>
+                        <Main games={this.props.games} chat = {this.props.chat} mychats = {this.props.mychats} createChat = {this.props.createChat} profile = {this.props.profile} friends = {this.props.friends} account = {this.props.account} add = {this.props.add}/>
                     </div>
             </div>
     }

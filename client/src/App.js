@@ -10,7 +10,7 @@ import store from './store'
         return(
             <Switch>
              <Route path = "/account">
-                 <Account chat = {props.chat} mychats = {props.mychats} createChat = {props.createChat} profile = {props.profile} friends = {props.friends} account = {props.account} add = {props.add}/>
+                 <Account games={props.games} chat = {props.chat} mychats = {props.mychats} createChat = {props.createChat} profile = {props.profile} friends = {props.friends} account = {props.account} add = {props.add}/>
              </Route>
              <Redirect to = "/account"/>
          </Switch>

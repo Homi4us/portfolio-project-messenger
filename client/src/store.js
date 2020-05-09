@@ -2,7 +2,7 @@ import { observable, action, decorate } from 'mobx';
 import cookie from 'react-cookies';
 import axios from 'axios'
 import { Upload, message } from 'antd';
-
+import openSocket from 'socket.io-client';
 
 
 var user = {
@@ -397,6 +397,23 @@ var chat = {
     }
 }
 
+const durak = {
+    createConnection(){
+        this.socket = openSocket("http://localhost:3001/durak")
+        this.connected = true
+        this.socket.on('disconnect', () => {
+            this.connected = false
+        })
+        this.socket.on("update_rooms", data => {
+            console.log(data)
+        })
+    }
+}
+
+var games = {
+    durak: durak
+}
+
 var store = {
     user:user,
     account: account,
@@ -405,8 +422,18 @@ var store = {
     profile: profile,
     createChat: createChat,
     mychats: mychats,
-    chat: chat
+    chat: chat, 
+    games: games
 }
+
+decorate(store.games, {
+    durak: observable
+})
+
+decorate(store.games.durak, {
+    socket: observable,
+    connected: observable
+})
 
 decorate(store.chat,{
     allMessages: observable,

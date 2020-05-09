@@ -44,7 +44,7 @@ class Main extends Component {
                     <Route exact path = "/account/games">
                         <Games games={gameList}/>
                     </Route>
-                    <Route path = "/account/games/:game" component={GameTemplate}/>
+                    <Route path = "/account/games/:game" render = { props => <GameTemplate {...props} gamesStore = {this.props.games}/>}/>
                </div>
     }
 }
