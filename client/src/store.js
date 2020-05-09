@@ -409,7 +409,7 @@ const durak = {
         })
     },
     async getRate(){
-        axios.get("http://localhost:3001/games/durak/getRate",{
+        axios.get("http://localhost:3000/games/durak/getRate",{
             headers: { Authorization: "Bearer " + cookie.load('jwt_token'),
             "Cache-Control": "no-cache, no-store, must-revalidate",
             contentType: "application/json"},
