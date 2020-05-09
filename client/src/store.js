@@ -407,6 +407,20 @@ const durak = {
         this.socket.on("update_rooms", data => {
             console.log(data)
         })
+    },
+    async getRate(){
+        axios.get("http://localhost:3001/games/durak/getRate",{
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token'),
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            contentType: "application/json"},
+            params:{firstname: account.name, lastname: account.lastname},
+            method: "get"}).then(
+            res => {
+                console.log(res)
+            }
+        ).catch(e => {
+            console.log(e)
+        })
     }
 }
 

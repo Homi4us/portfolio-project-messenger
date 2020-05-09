@@ -45,6 +45,7 @@ const columns = [
     }
     componentDidMount(){
         this.props.store.createConnection()
+        this.props.store.getRate()
     }
     getStatus(){
         if(this.props.store.connected){
