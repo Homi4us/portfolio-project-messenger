@@ -4,6 +4,7 @@ var passport = require('passport');
 
 const bodyParser = require('body-parser');
 var User = require('../models/users');
+var Chat = require('../models/chat')
 var authenticate = require('../authenticate');
 
 router.use(bodyParser.json());
@@ -135,6 +136,113 @@ router.post('/setuserdata', authenticate.verifyUser,(req,res,next)=>{
         next(error);
     })
 })
+
+//===================================CHAT========================================
+
+router.post('/createchat', authenticate.verifyUser,(req,res,next)=>{
+    Chat.create({created: true}).then((chat)=>{
+        chat.members.push(req.user._id);
+        chat.members.push(req.body.id);
+        chat.save()
+        User.find({_id:{ $in: [req.user._id, req.body.id]}}).then((users)=>{
+            users[0].chats.push(chat._id);
+            users[1].chats.push(chat._id);
+            users[0].save();
+            users[1].save();
+            res.statusCode = 200;
+            res.setHeader('Content-Type','application/json');
+            res.json(chat);
+        }).catch((err)=>{
+            var error = new Error('Что-то пошло не так');
+            error.status = 500;
+            console.log(err)
+            next(error);
+        })
+    }).catch((err)=>{
+        var error = new Error('Что-то пошло не так при создании чата');
+        error.status = 500;
+        console.log(err);
+        next(error);
+    })
+})
+
+router.get('/getuserchats', authenticate.verifyUser,(req,res,next)=>{
+    User.findById(req.user._id).then((user)=>{
+        var chats = user.chats.map((el)=>{return el._id})
+        Chat.find({_id:{$in: chats}}).populate({path: "members._id", select:"username", model: "User"}).then((chats)=>{
+           
+            res.statusCode = 200;
+            res.setHeader('Content-Type','application/json');
+            res.json(chats);
+        }).catch((err)=>{
+            err.status = 500;
+            console.log(err)
+            next(err);
+        })
+    }).catch((err)=>{
+            err.status = 500;
+            console.log(err)
+            next(err);
+    })
+})
+
+router.get('/getusersinchats', authenticate.verifyUser,(req,res,next)=>{
+    User.findById(req.user._id).then((user)=>{
+        var chats = user.chats.map((el)=>{return el._id})
+        Chat.find({_id:{$in: chats}}).then((chats)=>{
+            var members = [];
+            chats.forEach((el)=>{
+                el.members.forEach((mem)=>{
+                    members.push(mem._id)
+                })
+            });
+            res.statusCode = 200;
+            res.setHeader('Content-Type','application/json');
+            res.json(members);
+        }).catch((err)=>{
+            err.status = 500;
+            next(err);
+        })
+    }).catch((err)=>{
+        err.status = 500;
+        next(err);
+    })
+})
+
+router.post('/addmessage', authenticate.verifyUser, (req,res,next)=>{
+    Chat.findById(req.body.chat_id).then((chat)=>{
+        var now = new Date();
+        var day = now.getDate();
+        var month = now.getMonth() + 1;
+        var year = now.getFullYear();
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+
+        var full_time = "0"+day+".0"+month+"."+year+" "+hours+":"+minutes;
+
+        chat.messages.push({body: req.body.message, user: req.user._id, time: full_time});
+        chat.save();
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json');
+        res.json(chat);
+    }).catch((err)=>{
+        err.status = 500;
+        next(err);
+    })
+})
+
+router.get('/getchatmessages/:id', authenticate.verifyUser,(req,res,next)=>{
+    Chat.findById(req.params.id).populate({path: "messages.user", select:"username picture", model: "User"}).then((chat)=>{
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json');
+        res.json(chat.messages);
+    }).catch((err)=>{
+        err.status = 500;
+        next(err);
+    })
+})
+
+
 
 
 module.exports = router;

@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('confusionserver:server');
 var http = require('http');
+var Chat = require('../models/chat');
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +21,7 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+var io = require('socket.io')(server);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -28,6 +30,49 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+//==========================SOCKET EVENTS=============================
+
+io.sockets.on('connection', (socket) => {
+  console.log('a user connected');
+
+  socket.on('connection_room',(chat)=>{
+    socket.join(chat.chat_id);
+    console.log("User`s been connected to room: "+ chat.chat_id);
+    console.log(socket.rooms)
+  })
+
+  socket.on('disconnect',(socket)=>{
+    console.log("disconnect")
+  })
+
+  socket.on('message',(data)=>{
+    Chat.findById(data.chat_id).then((chat)=>{
+      var now = new Date();
+      var day = now.getDate();
+      var month = now.getMonth() + 1;
+      var year = now.getFullYear();
+      var hours = now.getHours();
+      var minutes = now.getMinutes();
+
+      var full_time = "0"+day+".0"+month+"."+year+" "+hours+":"+minutes;
+
+      chat.messages.push({body: data.body, user: data.id, time: full_time});
+      chat.save().then(()=>{
+        Chat.findById(data.chat_id).populate({path: "messages.user", select:"username picture", model: "User"}).then((chat)=>{
+          io.sockets.in(data.chat_id).emit('reload',{messages: chat.messages})
+      }).catch((err)=>{
+          console.log(err)
+      })
+      });
+  }).catch((err)=>{
+      console.log(err)
+  })
+  })
+});
+
+
+//====================================================================
 
 /**
  * Normalize a port into a number, string, or false.

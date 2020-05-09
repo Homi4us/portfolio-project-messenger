@@ -97,6 +97,7 @@ var user = {
 var account = {
     isLoaded: false,
     username: '',
+    userID: '',
     picture: 'https://pngimage.net/wp-content/uploads/2018/06/%D0%B0%D0%BD%D0%BE%D0%BD%D0%B8%D0%BC-png-7.png',
     friendsList: [],
     getData(){
@@ -110,6 +111,7 @@ var account = {
             this.friendsList = newArr;
             this.username = res.data[0].username;
             this.picture = res.data[0].picture;
+            this.userID = res.data[0]._id;
             this.isLoaded = true;
         })
     },
@@ -285,13 +287,133 @@ var profile = {
     }
 } 
 
+var createChat = {
+    isLoaded: false,
+    list:[],
+    users: [],
+    message: '',
+    getFriends(){
+        this.isLoaded = false;
+        this.message = '';
+        axios.get('/chat/getfriends',{
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token'),
+            "Cache-Control": "no-cache, no-store, must-revalidate"
+        }
+        }).then((res)=>{
+            if(res.data.length == 0){
+                this.message = 'Список друзей пуст...Воспользуйтесь поиском и найдите людей, с которыми хотите создать чат'
+            } else {
+                this.list = res.data;
+            }
+            this.isLoaded = true;
+        }).catch((err)=>{
+            this.message = 'Что-то пошло не так =(';
+            this.isLoaded = true;
+        })
+    },
+    getBySearch(username){
+        this.isLoaded = false;
+        this.message = '';
+        axios.get(`/chat/searchfriend/${username}`,{
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token') }
+        }).then((res)=>{
+            if(res.data.length == 0){
+                this.message = '=( Ничего не найдено...';
+            } else {
+                this.list = res.data;
+            } 
+            this.isLoaded = true;
+        }).catch((err)=>{
+            this.message = 'Не удалось загрузить список пользователей';
+            this.isLoaded = true;
+        })
+    },
+    getUsersInChats(){
+        this.isLoaded = false;
+        axios.get('/chat/getusersinchats',{
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token') }
+        }).then((users)=>{
+            this.users = users.data;
+            console.log(users)
+            this.isLoaded = true;
+        }).catch((err)=>{
+            this.isLoaded = true;
+        })
+    },
+    newChat(id, callback){
+        axios.post('/chat/createchat',{id: id},{
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token') }
+        }).then((res)=>{
+            callback(true, 'Успешно! Чат создан')
+        }).catch((err)=>{
+            callback(false,'Что-то пошло не так')
+        })
+    }
+}
+
+var mychats = {
+    Loaded: false,
+    chats:[],
+    username: '',
+    message: '',
+    getChats(){
+        this.Loaded = false;
+        this.message = '';
+        this.username = account.username;
+        axios.get('/chat/getuserchats',{
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token'),
+            "Cache-Control": "no-cache, no-store, must-revalidate"
+        } 
+        }).then((res)=>{
+            if(res.data.length == 0){
+                this.message = 'На данный момент чатов нет...'
+            }
+            this.Loaded = true;
+            this.chats = res.data;
+        }).catch((err)=>{
+            this.Loaded = true;
+            this.message = 'Не удалось загрузить список чатов...=('
+        })
+    }
+
+}
+
+var chat = {
+    allMessages:[],
+    message: '',
+    userID:'',
+    currentChat:'',
+    changeMessage(body){
+        this.message = body;
+    },
+    getMessages(){
+        this.userID = account.userID;
+        axios.get(`/chat/getchatmessages/${this.currentChat}`,{
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token'),
+            "Cache-Control": "no-cache, no-store, must-revalidate"}
+        }).then((res)=>{
+            this.allMessages = res.data;
+        })
+    }
+}
+
 var store = {
     user:user,
     account: account,
     add: add,
     friends: friends,
-    profile: profile
+    profile: profile,
+    createChat: createChat,
+    mychats: mychats,
+    chat: chat
 }
+
+decorate(store.chat,{
+    allMessages: observable,
+    message: observable,
+    currentChat: observable,
+    userID: observable
+})
 
 decorate(store.user, {
     isAuthenticated: observable,
@@ -330,6 +452,20 @@ decorate(store.profile,{
     userFirstname: observable,
     userLastname: observable,
     userStatus: observable
+})
+
+decorate(store.createChat,{
+    isLoaded: observable,
+    message: observable,
+    list: observable,
+    users: observable
+})
+
+decorate(store.mychats,{
+    Loaded:observable,
+    chats: observable,
+    message: observable,
+    username: observable
 })
 
 export default store;

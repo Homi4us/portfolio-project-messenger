@@ -2,6 +2,13 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var passportLocalMongoose = require('passport-local-mongoose');
 
+var Chats = new Schema({
+  id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Chat'
+  }
+})
+
 var Friends = new Schema({
     friend:{
       type: mongoose.Schema.Types.ObjectId,
@@ -29,7 +36,8 @@ var User = new Schema({
     status: {
         type: String,
         default: 'нет статуса'
-    }
+    },
+    chats: [ Chats ]
 },{
   timestamp:true
 });
