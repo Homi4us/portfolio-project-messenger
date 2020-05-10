@@ -398,6 +398,7 @@ var chat = {
 }
 
 const durak = {
+    rating: "55",
     createConnection(){
         this.socket = openSocket("http://localhost:3001/durak")
         this.connected = true
@@ -409,14 +410,15 @@ const durak = {
         })
     },
     async getRate(){
-        axios.get("http://localhost:3000/games/durak/getRate",{
+        axios.get("http://localhost:3000/games/durak/getPlayerInfo",{
             headers: { Authorization: "Bearer " + cookie.load('jwt_token'),
             "Cache-Control": "no-cache, no-store, must-revalidate",
             contentType: "application/json"},
-            params:{firstname: account.name, lastname: account.lastname},
+            params:{username: account.username},
             method: "get"}).then(
             res => {
-                console.log(res)
+                this.winners = res.data.data.winners
+                this.total = res.data.data.total
             }
         ).catch(e => {
             console.log(e)
@@ -441,12 +443,14 @@ var store = {
 }
 
 decorate(store.games, {
-    durak: observable
+    durak: observable,
 })
 
 decorate(store.games.durak, {
     socket: observable,
-    connected: observable
+    connected: observable,
+    winners: observable,
+    total: observable
 })
 
 decorate(store.chat,{

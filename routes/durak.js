@@ -13,20 +13,25 @@ router.get('/info', (req,res,next) => {
     res.statusCode = 200
     res.json({ok: true})
 })
-router.get('/getRate', authenticate.verifyUser, (req,res,next) => {
-    User.findOne({firstname: req.query.firstname, lastname: req.query.lastname})
+router.get('/getPlayerInfo', authenticate.verifyUser, (req,res,next) => {
+    if(!req.query.username){
+        res.setHeader("Content-Type","application/json")
+        res.statusCode = 400
+        return res.json({ok: false, data: "Bad params: username"})
+    }
+    User.findOne({username: req.query.username})
     .then((doc) => {
         if(!doc){
-            res.setHeader("Сontent-Type","application/json")
+            res.setHeader("Content-Type","application/json")
             res.statusCode = 404
             return res.json({ok: false, data: "Not Found!"})
         }
-        res.setHeader("Сontent-Type","application/json")
+        res.setHeader("Content-Type","application/json")
         res.statusCode = 200
-        res.json({ok: true, data: {rating: doc.durak_rate}})
+        res.json({ok: true, data: {winners: doc.durak_winners, total: doc.durak_total_games}})
     })
     .catch(e => {
-        res.setHeader("Сontent-Type","application/json")
+        res.setHeader("Content-Type","application/json")
         res.statusCode = 500
         res.json({ok: false, data: {error: e}})
     })
