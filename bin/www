@@ -8,6 +8,8 @@ var app = require('../app');
 var debug = require('debug')('confusionserver:server');
 var http = require('http');
 var Chat = require('../models/chat');
+const Durak = require('./durak/game')
+const durak = new Durak()
 
 /**
  * Get port from environment and store in Express.
@@ -80,6 +82,24 @@ io.sockets.on('connection', (socket) => {
   })
 });
 
+/**
+ *  socket for Durak game
+ */
+
+ const durakNamespace = io.of('/durak')
+ durakNamespace.on('connection', (socket) => {
+   console.log('connection to durak')
+   const updateRooms = () => {
+     durakNamespace.emit("update_rooms", {rooms: durak.rooms})
+   }
+   socket.on("create_room", data => {
+     console.log("create room")
+     updateRooms()
+   })
+   socket.on('disconnect', (data) => {
+     console.log('disconnection')
+   })
+ })
 
 //====================================================================
 

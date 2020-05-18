@@ -14,7 +14,7 @@ var config = require('./config');
 var usersRouter = require('./routes/users');
 const uploadRouter = require('./routes/uploadRouter');
 var chatRouter = require('./routes/chatRouter');
-
+var gamesRouter = require('./routes/gamesRouter');
 //all models
 
 
@@ -50,6 +50,7 @@ if(process.env.NODE_ENV === 'production'){
 app.use('/users', usersRouter);
 app.use('/imageUpload',uploadRouter);
 app.use('/chat',chatRouter);
+app.use('/games', gamesRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

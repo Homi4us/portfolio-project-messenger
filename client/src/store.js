@@ -2,8 +2,12 @@ import { observable, action, decorate } from 'mobx';
 import cookie from 'react-cookies';
 import axios from 'axios'
 import { Upload, message } from 'antd';
+<<<<<<< HEAD
 import io from 'socket.io-client';
 
+=======
+import openSocket from 'socket.io-client';
+>>>>>>> 1036071d78857d97fe105281a373a4588a721f25
 
 
 var user = {
@@ -405,6 +409,39 @@ var chat = {
     }
 }
 
+const durak = {
+    rating: "55",
+    createConnection(){
+        this.socket = openSocket("http://localhost:3001/durak")
+        this.connected = true
+        this.socket.on('disconnect', () => {
+            this.connected = false
+        })
+        this.socket.on("update_rooms", data => {
+            console.log(data)
+        })
+    },
+    async getRate(){
+        axios.get("http://localhost:3000/games/durak/getPlayerInfo",{
+            headers: { Authorization: "Bearer " + cookie.load('jwt_token'),
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            contentType: "application/json"},
+            params:{username: account.username},
+            method: "get"}).then(
+            res => {
+                this.winners = res.data.data.winners
+                this.total = res.data.data.total
+            }
+        ).catch(e => {
+            console.log(e)
+        })
+    }
+}
+
+var games = {
+    durak: durak
+}
+
 var store = {
     user:user,
     account: account,
@@ -413,8 +450,20 @@ var store = {
     profile: profile,
     createChat: createChat,
     mychats: mychats,
-    chat: chat
+    chat: chat, 
+    games: games
 }
+
+decorate(store.games, {
+    durak: observable,
+})
+
+decorate(store.games.durak, {
+    socket: observable,
+    connected: observable,
+    winners: observable,
+    total: observable
+})
 
 decorate(store.chat,{
     allMessages: observable,
