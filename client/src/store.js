@@ -2,6 +2,7 @@ import { observable, action, decorate } from 'mobx';
 import cookie from 'react-cookies';
 import axios from 'axios'
 import { Upload, message } from 'antd';
+import io from 'socket.io-client';
 
 
 
@@ -379,20 +380,27 @@ var mychats = {
 }
 
 var chat = {
+    Loaded: false,
     allMessages:[],
     message: '',
     userID:'',
     currentChat:'',
+    prevChat: '',
+    socket: io('http://localhost:3001'),
     changeMessage(body){
         this.message = body;
     },
     getMessages(){
+        this.Loaded = false
         this.userID = account.userID;
         axios.get(`/chat/getchatmessages/${this.currentChat}`,{
             headers: { Authorization: "Bearer " + cookie.load('jwt_token'),
             "Cache-Control": "no-cache, no-store, must-revalidate"}
         }).then((res)=>{
             this.allMessages = res.data;
+            this.Loaded = true;
+        }).catch((err)=>{
+            this.Loaded = true;
         })
     }
 }
@@ -412,7 +420,9 @@ decorate(store.chat,{
     allMessages: observable,
     message: observable,
     currentChat: observable,
-    userID: observable
+    prevChat: observable,
+    userID: observable,
+    Loaded: observable
 })
 
 decorate(store.user, {

@@ -15,7 +15,7 @@ export default class MessageCard extends Component {
     
     render() {
         return (
-            <div>
+            <div className = {this.props.last?'lastcard':''}>
                 <Comment
                 author={<p>{this.props.username}</p>}
                 avatar={

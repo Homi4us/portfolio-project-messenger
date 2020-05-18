@@ -1,8 +1,13 @@
 import React, { Component } from 'react'
 import './index.css'
-import {Input,Button} from 'antd'
+import {Input,Button, Spin} from 'antd'
 import MessageCard from './MessageCard/index'
 import { observer } from 'mobx-react';
+import {
+    PlusOutlined,
+    QuestionCircleTwoTone,
+    LoadingOutlined
+  } from '@ant-design/icons';
 import io from 'socket.io-client';
 
 const { TextArea } = Input;
@@ -14,19 +19,24 @@ const { TextArea } = Input;
         super(props)
     }
 
-    socket = io('http://localhost:3001')
+    componentWillMount(){
+        this.props.chat.Loaded = false
+    }
 
     componentDidMount(){
         this.props.chat.getMessages()
-        this.socket.emit('connection_room',{chat_id: this.props.chat.currentChat})
+        this.props.chat.socket.emit('connection_room',{chat_id: this.props.chat.currentChat, prev: this.props.chat.prevChat})
+    }
+
+    componentDidUpdate(){
+        document.getElementById('chat').scrollTop = 99999999999999999999999999999999
         
     }
 
 
     enterHandler = (value)=>{
         
-        this.socket.emit('message',{body: this.props.chat.message, chat_id: this.props.chat.currentChat, id: this.props.chat.userID})
-        
+        this.props.chat.socket.emit('message',{body: this.props.chat.message, chat_id: this.props.chat.currentChat, id: this.props.chat.userID})
         this.props.chat.message = ''
     }
 
@@ -35,21 +45,34 @@ const { TextArea } = Input;
     }
 
     render() {
-        this.socket.on('reload',(data)=>{
+        this.props.chat.socket.on('reload',(data)=>{
             this.props.chat.allMessages = data.messages
          })
-        var block =  document.getElementsByClassName("chat-area")
-        block.scrollTop = block.scrollHeight
+        
         return (
             <div className = "container-main__mychats__chat">
-                <div className = "chat-area">
-                    <div className = "message-area">
-                        {
-                            this.props.chat.allMessages.map((el,index)=>{
-                                return <MessageCard body = {el.body} time = {el.time} username = {el.user.username} picture = {el.user.picture} key = {index}/>
-                            })
-                        }
-                    </div>
+                <div className = "chat-area" id = "chat">
+                    {
+                        this.props.chat.Loaded
+                        ?
+                            <div className = "message-area">
+                            {
+                                this.props.chat.allMessages.map((el,index)=>{
+                                    if(this.props.chat.allMessages.length == index+1){
+                                        return <MessageCard last = {true} body = {el.body} time = {el.time} username = {el.user.username} picture = {el.user.picture} key = {index}/>
+                                    } else {
+                                    return <MessageCard last = {false} body = {el.body} time = {el.time} username = {el.user.username} picture = {el.user.picture} key = {index}/>
+                                    }
+                                    
+                                })
+                                
+                            }
+                        </div>
+                        :
+                        <div className = "add-loader">
+                        <LoadingOutlined />
+                        </div>
+                    }
                 </div>
                 <p></p>
                 <div>

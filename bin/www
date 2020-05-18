@@ -33,13 +33,22 @@ server.on('listening', onListening);
 
 //==========================SOCKET EVENTS=============================
 
+
 io.sockets.on('connection', (socket) => {
   console.log('a user connected');
-
+  var id = socket.id;
   socket.on('connection_room',(chat)=>{
+    if(chat.prev != ''){
+      if(chat.prev != chat.chat_id){
+        io.sockets.sockets[id].leave(chat.prev,(err)=>{
+          console.log(err)
+          io.in(chat.prev).clients((err, users) => {console.log(users)})
+        });
+    }
+    }
+    
     socket.join(chat.chat_id);
     console.log("User`s been connected to room: "+ chat.chat_id);
-    console.log(socket.rooms)
   })
 
   socket.on('disconnect',(socket)=>{

@@ -18,6 +18,7 @@ const { confirm } = Modal;
     }
 
     clickHandler = (e)=>{
+      this.props.chat.prevChat = this.props.chat.currentChat
        this.props.chat.currentChat = this.props.id
     }
 

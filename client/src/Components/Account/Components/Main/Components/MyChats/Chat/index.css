@@ -15,3 +15,17 @@
     height: 100%;
     padding: 25px;
 }
+
+.lastcard{
+    animation: last 0.4s ease forwards;
+}
+
+@keyframes last{
+    from{
+        opacity:0;
+    }
+    to{
+        opacity:1;
+    }
+}
+
